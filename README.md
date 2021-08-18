@@ -1,6 +1,6 @@
-#Git workflow
+# Git workflow
 
-##General setup
+## General setup
 . Fork the repo. In most git frontends, that fork will end up at
 ```
 	git@github.com:<username>/libfrizz.git
