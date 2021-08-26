@@ -1,0 +1,27 @@
+name: Frizz is CLI for libfrizz, check https://github.com/kursatkobya/libfrizz
+version: "0.0"
+author: Ozkan Pakdil, Kursat Kobya
+about: transfer data
+args:
+  - target:
+      short: t
+      long: target
+      help: Destination url for any action(GET,POST,...)
+      takes_value: true
+  - dump-header:
+      short: D
+      long: dump-header
+      help: printing headers for choosen action.
+  - pretty:
+      long: pretty
+      help: format the body of response, html or json ....
+
+# subcommands:
+#     - test:
+#         about: controls testing features
+#         version: "1.3"
+#         author: Someone E. <someone_else@other.com>
+#         args:
+#             - debug:
+#                 short: d
+#                 about: print debug information
