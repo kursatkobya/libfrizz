@@ -6,13 +6,11 @@ pub struct FizzResult {
 
 pub async fn get_header(url: &str) -> Result<FizzResult, reqwest::Error> {
     let res = reqwest::get(url).await?;
-    Ok(
-        FizzResult {
-            status_code: res.status().to_string(),
-            headers: format!("Headers:\n{:#?}", res.headers()),
-            body: res.text().await?,
-        }
-    )
+    Ok(FizzResult {
+        status_code: res.status().to_string(),
+        headers: format!("Headers:\n{:#?}", res.headers()),
+        body: res.text().await?,
+    })
 }
 
 #[cfg(test)]
