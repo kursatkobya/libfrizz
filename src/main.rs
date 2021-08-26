@@ -1,6 +1,6 @@
 use std::convert::TryFrom;
 use std::env;
-use std::io::{Error, ErrorKind};
+use std::io::Error;
 
 use ansi_term::Colour;
 use clap::{load_yaml, App};
@@ -12,8 +12,8 @@ async fn main() -> Result<(), Error> {
     let yaml = load_yaml!("cli.yaml");
     let cmd_args = App::from(yaml).get_matches();
 
-    if args.len() == 1 {
-        App::from(yaml).print_help();
+   if args.iter().len() == 1 {
+        App::from(yaml).print_help().ok();
         println!("\nERROR:Please provide the parameters");
         return Ok(());
     }
@@ -30,22 +30,15 @@ async fn main() -> Result<(), Error> {
         }
 
         if cmd_args.is_present("pretty") {
-            println!(
-                "{}",
-                Colour::White.paint(dprint_core::formatting::format(
-                    || {
-                        {
-                            PrintItems::try_from(body).unwrap()
-                        }
-                    },
-                    PrintOptions {
-                        indent_width: 4,
-                        max_width: 10,
-                        use_tabs: false,
-                        new_line_text: "\n",
-                    },
-                ))
-            );
+           let opts = PrintOptions {
+                indent_width: 4,
+                max_width: 10,
+                use_tabs: false,
+                new_line_text: "\n",
+            };
+            let items = PrintItems::try_from(body).unwrap();
+            let out_prep = Colour::White.paint(dprint_core::formatting::format(|| items, opts));
+            println!("{}", out_prep);
         } else {
             println!("{}", Colour::White.paint(body));
         }

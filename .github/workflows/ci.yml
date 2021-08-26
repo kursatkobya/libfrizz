@@ -1,6 +1,6 @@
-name: Rust Example
+name: Frizz ci run
 
-on: [push]
+on: [ push ]
 
 jobs:
   build:
@@ -23,7 +23,6 @@ jobs:
           source $HOME/.cargo/env
           cargo --version
           cargo fmt -- --check
-#          cargo clippy -- -Dwarnings
-          cargo clippy
+          cargo clippy -- -Dwarnings
           cargo test
           cargo run
