@@ -9,13 +9,13 @@ name = "libfrizz"
 crate-type = ["lib"]
 
 [dependencies]
-reqwest = { version = "0.11", features = ["blocking", "json"] }
-tokio = { version = "1", features = ["full"] }
+reqwest = { version = "0.11.4", features = ["blocking", "json"] }
+tokio = { version = "1.10.1", features = ["full"] }
 select = "0.6.0-alpha.1"
 clap = { version = "2.33.3", features = ["yaml"] }
 ansi_term = "0.12.1"
 dprint-core = "0.44.0"
 
 [dev-dependencies]
-serial_test = "*"
+serial_test = "0.5.1"
 
