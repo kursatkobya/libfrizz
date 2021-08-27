@@ -12,7 +12,7 @@ async fn main() -> Result<(), Error> {
     let yaml = load_yaml!("cli.yaml");
     let cmd_args = App::from(yaml).get_matches();
 
-    if args.len() == 1 {
+    if args.iter().len() == 1 {
         App::from(yaml).print_help().ok();
         println!("\nERROR:Please provide the parameters");
         return Ok(());
