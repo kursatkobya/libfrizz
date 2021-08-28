@@ -12,7 +12,7 @@ async fn main() -> Result<(), Error> {
     let yaml = load_yaml!("cli.yaml");
     let cmd_args = App::from(yaml).get_matches();
 
-   if args.iter().len() == 1 {
+    if args.iter().len() == 1 {
         App::from(yaml).print_help().ok();
         println!("\nERROR:Please provide the parameters");
         return Ok(());
@@ -30,7 +30,7 @@ async fn main() -> Result<(), Error> {
         }
 
         if cmd_args.is_present("pretty") {
-           let opts = PrintOptions {
+            let opts = PrintOptions {
                 indent_width: 4,
                 max_width: 10,
                 use_tabs: false,
