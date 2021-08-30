@@ -1,10 +1,9 @@
-use std::convert::TryFrom;
 use std::env;
 use std::io::Error;
 
 use ansi_term::Colour;
 use clap::{load_yaml, App};
-use dprint_core::formatting::{PrintItems, PrintOptions};
+use dprint_core::formatting::PrintOptions;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -36,7 +35,7 @@ async fn main() -> Result<(), Error> {
                 use_tabs: false,
                 new_line_text: "\n",
             };
-            let items = PrintItems::try_from(body).unwrap();
+            let items = dprint_core::formatting::parser_helpers::parse_string(body.as_str());
             let out_prep = Colour::White.paint(dprint_core::formatting::format(|| items, opts));
             println!("{}", out_prep);
         } else {
