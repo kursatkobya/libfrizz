@@ -7,6 +7,7 @@ use dprint_core::formatting::PrintOptions;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
+    let frizz_version = env!("CARGO_PKG_VERSION");
     let args: Vec<String> = env::args().collect();
     let yaml = load_yaml!("cli.yaml");
     let cmd_args = App::from(yaml).get_matches();
@@ -18,7 +19,14 @@ async fn main() -> Result<(), Error> {
     }
 
     if cmd_args.is_present("target") {
-        let res = libfrizz::get_header(cmd_args.value_of("target").unwrap())
+        let verbose = cmd_args.is_present("verbose");
+        let target = cmd_args.value_of("target").unwrap();
+        let user_agent = if cmd_args.is_present("user-agent") {
+            String::from(cmd_args.value_of("user-agent").unwrap())
+        } else {
+            format!("frizz / {}", frizz_version)
+        };
+        let res = libfrizz::get_request(target, user_agent, verbose)
             .await
             .ok()
             .unwrap();

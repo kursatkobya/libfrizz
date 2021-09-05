@@ -15,6 +15,15 @@ args:
   - pretty:
       long: pretty
       help: format the body of response, html or json ....
+  - user-agent:
+      short: A
+      long: user-agent
+      help: Send User-Agent <name> to server
+      takes_value: true
+  - verbose:
+      short: v
+      long: verbose
+      help: Make the operation more talkative
 
 # subcommands:
 #     - test:
