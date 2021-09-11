@@ -1,9 +1,11 @@
-use std::env;
-use std::io::Error;
+use std::io::{Error, Write};
+use std::{env, io};
 
 use ansi_term::Colour;
 use clap::{load_yaml, App};
 use dprint_core::formatting::PrintOptions;
+use std::fs::File;
+use std::path::Path;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -31,9 +33,18 @@ async fn main() -> Result<(), Error> {
             .ok()
             .unwrap();
         let body = res.body;
-        println!("{}", Colour::Green.paint(res.status_code));
+
+        let mut out_writer = match cmd_args.value_of("output") {
+            Some(x) => {
+                let path = Path::new(x);
+                Box::new(File::create(&path).unwrap()) as Box<dyn Write>
+            }
+            None => Box::new(io::stdout()) as Box<dyn Write>,
+        };
+
+        out_writer.write(format!("{}", Colour::Green.paint(res.status_code)).as_bytes()).ok();
         if cmd_args.is_present("dump-header") {
-            println!("{}", Colour::Blue.paint(res.headers));
+            out_writer.write(format!("{}", Colour::Blue.paint(res.headers)).as_bytes()).ok();
         }
 
         if cmd_args.is_present("pretty") {
@@ -45,9 +56,9 @@ async fn main() -> Result<(), Error> {
             };
             let items = dprint_core::formatting::parser_helpers::parse_string(body.as_str());
             let out_prep = Colour::White.paint(dprint_core::formatting::format(|| items, opts));
-            println!("{}", out_prep);
+            out_writer.write(out_prep.as_bytes()).ok();
         } else {
-            println!("{}", Colour::White.paint(body));
+            out_writer.write(format!("{}", Colour::White.paint(body)).as_bytes()).ok();
         }
     }
 

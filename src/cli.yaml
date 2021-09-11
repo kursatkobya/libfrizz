@@ -20,6 +20,11 @@ args:
       long: user-agent
       help: Send User-Agent <name> to server
       takes_value: true
+  - output:
+      short: o
+      long: outpu
+      help: Write to file instead of stdout
+      takes_value: true
   - verbose:
       short: v
       long: verbose
