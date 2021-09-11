@@ -42,9 +42,13 @@ async fn main() -> Result<(), Error> {
             None => Box::new(io::stdout()) as Box<dyn Write>,
         };
 
-        out_writer.write(format!("{}", Colour::Green.paint(res.status_code)).as_bytes()).ok();
+        out_writer
+            .write(format!("{}", Colour::Green.paint(res.status_code)).as_bytes())
+            .ok();
         if cmd_args.is_present("dump-header") {
-            out_writer.write(format!("{}", Colour::Blue.paint(res.headers)).as_bytes()).ok();
+            out_writer
+                .write(format!("{}", Colour::Blue.paint(res.headers)).as_bytes())
+                .ok();
         }
 
         if cmd_args.is_present("pretty") {
@@ -58,7 +62,9 @@ async fn main() -> Result<(), Error> {
             let out_prep = Colour::White.paint(dprint_core::formatting::format(|| items, opts));
             out_writer.write(out_prep.as_bytes()).ok();
         } else {
-            out_writer.write(format!("{}", Colour::White.paint(body)).as_bytes()).ok();
+            out_writer
+                .write(format!("{}", Colour::White.paint(body)).as_bytes())
+                .ok();
         }
     }
 
