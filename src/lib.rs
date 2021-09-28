@@ -11,13 +11,17 @@ pub struct FizzResult {
 pub async fn execute_request(
     url: &str,
     user_agent: String,
-    verbose: bool,
+    _verbose: bool,
+    _disable_cert_validation: bool,
+    _disable_hostname_validation: bool,
     body: Option<&str>,
     method: Method,
 ) -> Result<FizzResult, reqwest::Error> {
     let client = reqwest::Client::builder()
         .user_agent(user_agent)
-        .connection_verbose(verbose)
+        .danger_accept_invalid_certs(_disable_cert_validation)
+        .danger_accept_invalid_hostnames(_disable_hostname_validation)
+        .connection_verbose(_verbose)
         .build()?;
 
     let mut req = Request::new(method, Url::from_str(url).unwrap());
@@ -49,6 +53,8 @@ mod tests {
             "http://httpbin.org/get",
             "rusty".to_string(),
             true,
+            true,
+            true,
             Option::from(""),
             Method::GET,
         )
@@ -65,6 +71,8 @@ mod tests {
         let res = execute_request(
             "httpjhb://httpbin.org/get",
             "rusty".to_string(),
+            true,
+            true,
             true,
             Option::from(""),
             Method::GET,

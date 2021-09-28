@@ -22,7 +22,13 @@ async fn main() -> Result<(), Error> {
     }
 
     if cmd_args.is_present("target") {
+        let insecure = cmd_args.is_present("insecure");
         let verbose = cmd_args.is_present("verbose");
+        if verbose {
+            simple_logger::init().unwrap();
+        } else {
+            simple_logger::init_with_level(log::Level::Warn).unwrap();
+        }
         let target = cmd_args.value_of("target").unwrap();
         let user_agent = if cmd_args.is_present("user-agent") {
             String::from(cmd_args.value_of("user-agent").unwrap())
@@ -34,11 +40,13 @@ async fn main() -> Result<(), Error> {
             Some(x) => Method::from_bytes(x.as_bytes()).unwrap(),
             _ => Method::GET,
         };
-
+        log::info!("verbose:{}", verbose);
         let res = libfrizz::execute_request(
             target,
             user_agent,
             verbose,
+            insecure,
+            insecure, // TODO: we can accept this from another parameter, for now insecure covers.
             cmd_args.value_of("data"),
             method,
         )

@@ -1,0 +1,7 @@
+localhost {
+    basicauth /secret/* {
+        # username Bob password hiccup
+        Bob JDJhJDEwJEVCNmdaNEg2Ti5iejRMYkF3MFZhZ3VtV3E1SzBWZEZ5Q3VWc0tzOEJwZE9TaFlZdEVkZDhX
+    }
+	respond "Hello, world!"
+}

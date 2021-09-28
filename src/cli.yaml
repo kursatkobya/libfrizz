@@ -43,6 +43,10 @@ args:
       short: v
       long: verbose
       help: Make the operation more talkative
+  - insecure:
+      short: k
+      long: insecure
+      help: Allow insecure server connections when using SSL
 
 # subcommands:
 #     - test:
