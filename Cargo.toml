@@ -17,6 +17,7 @@ ansi_term = "0.12.1"
 dprint-core = "0.44.0"
 log = "0.4.14"
 simple_logger = "1.13.0"
+futures = "0.3"
 
 [dev-dependencies]
 serial_test = "0.5.1"

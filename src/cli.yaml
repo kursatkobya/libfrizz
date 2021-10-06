@@ -11,7 +11,7 @@ args:
   - dump-header:
       short: D
       long: dump-header
-      help: printing headers for choosen action.
+      help: Prints headers for choosen action.
   - pretty:
       long: pretty
       help: format the body of response, html or json ....
@@ -47,7 +47,10 @@ args:
       short: k
       long: insecure
       help: Allow insecure server connections when using SSL
-
+  - scan:
+      short: s
+      long: scan
+      help: Scans ports for given target (example; frizz -s -t  example.net)
 # subcommands:
 #     - test:
 #         about: controls testing features
