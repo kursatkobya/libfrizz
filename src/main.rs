@@ -1,16 +1,16 @@
-use std::io::{Error, Write};
 use std::{env, io,
+          io::{Error, Write},
           net::{SocketAddr, ToSocketAddrs},
+          fs::File,path::Path,
+          cmp
 };
 use ansi_term::Colour;
 use clap::{load_yaml, App, ArgMatches};
 use dprint_core::formatting::PrintOptions;
 use reqwest::{Method, Url};
-use std::fs::File;
-use std::path::Path;
-
-use tokio::io::{AsyncReadExt, Interest};
-use tokio::{io::AsyncWriteExt, net::TcpStream};
+use tokio::{io::{AsyncReadExt,AsyncWriteExt, Interest},
+            net::TcpStream
+};
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -66,17 +66,28 @@ async fn main() -> Result<(), Error> {
                 }
                 println!("ip addr {}", socket_addresses[0].ip());
                 let timeout= cmd_args
-                                    .value_of("timeout")
-                                    .unwrap()
-                                    .parse::<u64>()
-                                    .unwrap_or(1);
+                                  .value_of("timeout")
+                                  .unwrap()
+                                  .parse::<u64>()
+                                  .unwrap_or(1);
                 let concurrency = cmd_args
-                                    .value_of("concurrency")
-                                    .unwrap()
-                                    .parse::<usize>()
-                                    .unwrap_or(1024);
-                libfrizz::scan(socket_addresses[0].ip(), 1000, timeout).await;
-                libfrizz::scan(socket_addresses[0].ip(), concurrency, timeout).await;
+                                        .value_of("concurrency")
+                                        .unwrap()
+                                        .parse::<usize>()
+                                        .unwrap_or(1024);
+                let port_range:Vec<&str> = cmd_args
+                                           .values_of("ports")
+                                           .unwrap()
+                                           .collect();
+                let port1:u16 = port_range[0].parse()
+                                .expect("Unexpected port entry: Enter a valid port number");
+                let port2:u16 = port_range[1].parse()
+                                .expect("Unexpected port entry: Enter a valid port number");
+                libfrizz::scan(socket_addresses[0].ip(),
+                               concurrency,
+                               timeout,
+                               cmp::min(port1,port2),
+                               cmp::max(port1,port2)).await;
                 return Ok(());
             }
 

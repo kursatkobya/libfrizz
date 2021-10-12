@@ -62,6 +62,13 @@ args:
       help: Concurrency
       default_value: "1024"
       takes_value: true
+  - ports:
+      short: p
+      long: ports
+      help: Ports to scan between given two numbers
+      default_value: "80 1024"
+      takes_value: true
+      multiple: true
 # subcommands:
 #     - test:
 #         about: controls testing features

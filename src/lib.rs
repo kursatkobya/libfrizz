@@ -44,8 +44,8 @@ pub async fn execute_request(
     })
 }
 
-pub async fn scan(target: IpAddr, concurrency: usize, timeout: u64) {
-    let ports = stream::iter(1..=u16::MAX);
+pub async fn scan(target: IpAddr, concurrency: usize, timeout: u64, min_port:u16, max_port:u16) {
+    let ports = stream::iter(min_port..=max_port);
 
     ports
         .for_each_concurrent(concurrency, |port| scan_port(target, port, timeout))
