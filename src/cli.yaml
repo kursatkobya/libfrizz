@@ -4,7 +4,6 @@ author: Ozkan Pakdil, Kursat Kobya
 about: transfer data
 args:
   - target:
-      short: t
       long: target
       help: Destination url for any action(GET,POST,...)
       takes_value: true
@@ -51,6 +50,12 @@ args:
       short: s
       long: scan
       help: Scans ports for given target (example; frizz -s -t  example.net)
+  - timeout:
+      short: t
+      long: timeout
+      help: Connection timeout
+      default_value: "3"
+      takes_value: true
 # subcommands:
 #     - test:
 #         about: controls testing features

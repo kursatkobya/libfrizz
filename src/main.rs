@@ -66,7 +66,12 @@ async fn main() -> Result<(), Error> {
                     return Ok(());
                 }
                 println!("ip addr {}", socket_addresses[0].ip());
-                scan(socket_addresses[0].ip(), 1000, 1).await;
+                let timeout= cmd_args
+                                    .value_of("timeout")
+                                    .unwrap()
+                                    .parse::<u64>()
+                                    .unwrap_or(1);
+                scan(socket_addresses[0].ip(), 1000, timeout).await;
                 return Ok(());
             }
 
