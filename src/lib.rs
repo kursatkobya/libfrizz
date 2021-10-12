@@ -1,6 +1,10 @@
 use std::str::FromStr;
 
 use reqwest::{Body, Method, Request, Url};
+use tokio::{net::TcpStream};
+use std::{net::{IpAddr, SocketAddr},
+          time::Duration,};
+use futures::{stream, StreamExt};
 
 pub struct FizzResult {
     pub status_code: String,
@@ -38,6 +42,26 @@ pub async fn execute_request(
         headers: format!("Headers:\n{:#?}", res.headers()),
         body: res.text().await?,
     })
+}
+
+pub async fn scan(target: IpAddr, concurrency: usize, timeout: u64) {
+    let ports = stream::iter(1..=u16::MAX);
+
+    ports
+        .for_each_concurrent(concurrency, |port| scan_port(target, port, timeout))
+        .await;
+}
+
+async fn scan_port(target: IpAddr, port: u16, timeout: u64) {
+    let timeout = Duration::from_secs(timeout);
+    let socket_address = SocketAddr::new(target, port);
+
+    if tokio::time::timeout(timeout, TcpStream::connect(&socket_address))
+        .await
+        .is_ok()
+    {
+        println!("{}", port);
+    }
 }
 
 #[cfg(test)]
