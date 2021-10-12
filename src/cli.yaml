@@ -56,6 +56,12 @@ args:
       help: Connection timeout
       default_value: "3"
       takes_value: true
+  - concurrency:
+      short: c
+      long: concurrency
+      help: Concurrency
+      default_value: "1024"
+      takes_value: true
 # subcommands:
 #     - test:
 #         about: controls testing features

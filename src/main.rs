@@ -70,7 +70,13 @@ async fn main() -> Result<(), Error> {
                                     .unwrap()
                                     .parse::<u64>()
                                     .unwrap_or(1);
+                let concurrency = cmd_args
+                                    .value_of("concurrency")
+                                    .unwrap()
+                                    .parse::<usize>()
+                                    .unwrap_or(1024);
                 libfrizz::scan(socket_addresses[0].ip(), 1000, timeout).await;
+                libfrizz::scan(socket_addresses[0].ip(), concurrency, timeout).await;
                 return Ok(());
             }
 
