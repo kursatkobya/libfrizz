@@ -66,7 +66,8 @@ args:
       short: p
       long: ports
       help: Ports to scan between given two numbers
-      default_value: "80 1024"
+      min_values: 2
+      max_values: 2
       takes_value: true
       multiple: true
 # subcommands:

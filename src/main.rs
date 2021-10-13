@@ -75,14 +75,20 @@ async fn main() -> Result<(), Error> {
                                         .unwrap()
                                         .parse::<usize>()
                                         .unwrap_or(1024);
-                let port_range:Vec<&str> = cmd_args
-                                           .values_of("ports")
-                                           .unwrap()
-                                           .collect();
-                let port1:u16 = port_range[0].parse()
-                                .expect("Unexpected port entry: Enter a valid port number");
-                let port2:u16 = port_range[1].parse()
-                                .expect("Unexpected port entry: Enter a valid port number");
+
+                let mut port1: u16 = 80; let mut port2: u16 = 1024;
+                if cmd_args.is_present("ports") {
+                    let port_range:Vec<&str> = cmd_args
+                        .values_of("ports")
+                        .unwrap()
+                        .collect();
+                    if !port_range.is_empty() {
+                        port1 = port_range[0].parse()
+                            .expect("Unexpected port entry: Enter a valid port number");
+                        port2 = port_range[1].parse()
+                            .expect("Unexpected port entry: Enter a valid port number");
+                    }
+                }
                 libfrizz::scan(socket_addresses[0].ip(),
                                concurrency,
                                timeout,
