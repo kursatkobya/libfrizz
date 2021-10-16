@@ -1,10 +1,15 @@
-use std::str::FromStr;
-
 use reqwest::{Body, Method, Request, Url};
-use tokio::{net::TcpStream};
+use tokio::{io::{AsyncReadExt,AsyncWriteExt, Interest},
+            net::TcpStream
+};
 use std::{net::{IpAddr, SocketAddr},
-          time::Duration,};
+          time::Duration,
+          str::FromStr,
+          io,
+          io::{Error, Write},
+};
 use futures::{stream, StreamExt};
+use ansi_term::Colour;
 
 pub struct FizzResult {
     pub status_code: String,
@@ -61,6 +66,35 @@ async fn scan_port(target: IpAddr, port: u16, timeout: u64) {
         .is_ok()
     {
         println!("{}", port);
+    }
+}
+
+pub async fn open_socket_target(target: &str) -> Result<(), Error> {
+    log::info!("Socket connection");
+
+    let t_url = Url::parse(target).unwrap();
+    let addrs = t_url.socket_addrs(|| None).unwrap();
+    let mut stream = TcpStream::connect(&*addrs).await?;
+
+    loop {
+        let ready = stream
+            .ready(Interest::READABLE | Interest::WRITABLE)
+            .await?;
+        let mut data = vec![];
+        if ready.is_writable() {
+            let prompt = format!("{}{:?}{}", "Connected ", stream.peer_addr(), ">");
+            print!("{}", Colour::Green.paint(prompt));
+            io::stdout().flush().ok();
+
+            let mut input = String::new();
+            io::stdin().read_line(&mut input).ok();
+            if input.trim().eq_ignore_ascii_case("exit") {
+                return Ok(());
+            }
+            stream.write_all(input.as_bytes()).await?;
+            stream.read_to_end(&mut data).await?;
+            println!("Response:{:?}", String::from_utf8(data));
+        }
     }
 }
 
