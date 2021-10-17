@@ -61,12 +61,7 @@ async fn scan_port(target: IpAddr, port: u16, timeout: u64) {
     let timeout = Duration::from_secs(timeout);
     let socket_address = SocketAddr::new(target, port);
 
-    if tokio::time::timeout(timeout, TcpStream::connect(&socket_address))
-        .await
-        .is_ok()
-    {
-        println!("{}", port);
-    }
+    if let Ok(Ok(_)) = tokio::time::timeout(timeout, TcpStream::connect(&socket_address)).await { println!("{}", port) }
 }
 
 pub async fn open_socket_target(target: &str) -> Result<(), Error> {

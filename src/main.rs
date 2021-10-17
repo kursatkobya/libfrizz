@@ -57,7 +57,7 @@ async fn main() -> Result<(), Error> {
                 println!("Socket_addresses list is empty");
                 return Ok(());
             }
-            println!("ip addr {}", socket_addresses[0].ip());
+
             let timeout= cmd_args
                               .value_of("timeout")
                               .unwrap()
@@ -82,6 +82,7 @@ async fn main() -> Result<(), Error> {
                         .expect("Unexpected port entry: Enter a valid port number");
                 }
             }
+
             libfrizz::scan(socket_addresses[0].ip(),
                            concurrency,
                            timeout,
