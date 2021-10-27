@@ -92,6 +92,7 @@ async fn main() -> Result<(), Error> {
             timeout,
             cmp::min(port1, port2),
             cmp::max(port1, port2),
+            cmd_args.value_of("output").unwrap_or("")
         )
         .await;
         return Ok(());
