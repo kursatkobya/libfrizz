@@ -1,8 +1,5 @@
 use ansi_term::Colour;
-use futures::{
-    stream, StreamExt,
-    lock::Mutex,
-};
+use futures::{stream, StreamExt, lock::Mutex};
 use indicatif::{ProgressBar, ProgressStyle};
 use reqwest::{Body, Method, Request, Url};
 use std::cmp::min;
@@ -112,9 +109,17 @@ pub async fn scan(target: IpAddr, concurrency: usize, timeout: u64, min_port: u1
     let ports = stream::iter(min_port..=max_port);
     let output_values = Arc::new(Mutex::new(Vec::new()));
     let before = Instant::now();
+
+    let pb = ProgressBar::new((max_port-min_port).into());
+    pb.set_style(ProgressStyle::default_bar()
+        .template("{msg}\n{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {pos:>}/{len}  ({percent}%, {eta})")
+        .progress_chars("##-"));
+    pb.set_message(format!("Scanning ports for {}", target));
+
     ports
         .for_each_concurrent(concurrency, |port| {
             let output_values = output_values.clone();
+            pb.inc(1);
             async move {
                 let result = scan_port(target, port, timeout).await;
                 if result > 0 {
@@ -130,7 +135,7 @@ pub async fn scan(target: IpAddr, concurrency: usize, timeout: u64, min_port: u1
         let path = Path::new(out);
         Box::new(File::create(&path).unwrap()) as Box<dyn Write>
     };
-
+    pb.finish();
     for i in output_values.lock().await.iter(){
         out_writer
             .write(Colour::Blue.paint(format!("{:?}\n", i)).as_bytes())
