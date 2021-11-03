@@ -118,8 +118,8 @@ async fn main() -> Result<(), Error> {
             .parse::<usize>()
             .unwrap_or(1024);
 
-        let mut port1: u16 = 80;
-        let mut port2: u16 = 1024;
+        let mut port1: u16 = 0;
+        let mut port2: u16 = 0;
         if cmd_args.is_present("ports") {
             let port_range: Vec<&str> = cmd_args.values_of("ports").unwrap().collect();
             if !port_range.is_empty() {

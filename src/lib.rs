@@ -1,3 +1,5 @@
+mod port_details;
+
 use ansi_term::Colour;
 use futures::{lock::Mutex, stream, StreamExt};
 use indicatif::{ProgressBar, ProgressStyle};
@@ -105,6 +107,17 @@ pub async fn execute_request(exec: ExecRequest) -> Result<FizzResult, reqwest::E
     })
 }
 
+fn get_ports(min_port: u16, max_port: u16) -> (Box<dyn Iterator<Item = u16>>, u16) {
+    if min_port == 0 && max_port == 0 {
+        (
+            Box::new(port_details::MOST_COMMON_PORTS.to_owned().into_iter()),
+            port_details::MOST_COMMON_PORTS.len() as u16,
+        )
+    } else {
+        (Box::new(min_port..=max_port), max_port - min_port)
+    }
+}
+
 pub async fn scan(
     target: IpAddr,
     concurrency: usize,
@@ -113,11 +126,12 @@ pub async fn scan(
     max_port: u16,
     mut out_writer: Box<dyn Write>,
 ) {
-    let ports = stream::iter(min_port..=max_port);
+    let (port_box, progress_size) = get_ports(min_port, max_port);
+    let ports = stream::iter(port_box);
     let output_values = Arc::new(Mutex::new(Vec::new()));
     let before = Instant::now();
 
-    let pb = ProgressBar::new((max_port - min_port).into());
+    let pb = ProgressBar::new(progress_size.into());
     pb.set_style(ProgressStyle::default_bar()
         .template("{msg}\n{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {pos:>}/{len}  ({percent}%, {eta})")
         .progress_chars("##-"));
