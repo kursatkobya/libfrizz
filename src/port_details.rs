@@ -1,3 +1,6 @@
+use std::collections::HashMap;
+use std::sync::Mutex;
+
 pub const MOST_COMMON_PORTS: &[u16] = &[
     1, 3, 4, 6, 7, 9, 13, 17, 19, 20, 21, 22, 23, 24, 25, 26, 30, 32, 33, 37, 42, 43, 49, 53, 70,
     79, 80, 81, 82, 83, 84, 85, 88, 89, 90, 99, 100, 106, 109, 110, 111, 113, 119, 125, 135, 139,
@@ -64,3 +67,12 @@ pub const MOST_COMMON_PORTS: &[u16] = &[
     55056, 55555, 55600, 56737, 56738, 57294, 57797, 58080, 60020, 60443, 61532, 61900, 62078,
     63331, 64623, 64680, 65000, 65129, 65389,
 ];
+
+lazy_static! {
+    pub static ref DETAILS: Mutex<HashMap<u16, &'static str>> = {
+        let mut m = HashMap::new();
+        m.insert(80,  "http        tcp, udp, sctp");
+        m.insert(443, "https       tcp, udp, sctp");
+        Mutex::new(m)
+    };
+}
