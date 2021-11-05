@@ -1,4 +1,5 @@
-#[macro_use(lazy_static)] extern crate lazy_static;
+#[macro_use(lazy_static)]
+extern crate lazy_static;
 mod port_details;
 
 use ansi_term::Colour;
@@ -154,12 +155,16 @@ pub async fn scan(
     pb.finish();
     let details = port_details::DETAILS.lock().unwrap();
     out_writer
-        .write(Colour::Green.paint(format!("Port\tService\t\tProtocol\n")).as_bytes())
+        .write(
+            Colour::Green
+                .paint(format!("Port\tService\t\tProtocol\n"))
+                .as_bytes(),
+        )
         .ok();
     for i in output_values.lock().await.iter() {
         let d = match details.get(i) {
             Some(detail) => detail,
-            None => ""
+            None => "",
         };
         out_writer
             .write(Colour::Blue.paint(format!("{:?}\t{:?}\n", i, d)).as_bytes())
