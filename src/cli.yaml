@@ -70,6 +70,12 @@ args:
       max_values: 2
       takes_value: true
       multiple: true
+  - protocol:
+      long: protocol
+      help: choose "tcp", "udp" or "sctp" to scan only tcp,udp or sctp ports
+      takes_value: true
+      default_value: "tcp"
+      multiple: false
   - progress-bar:
       short: "#"
       long: progress-bar

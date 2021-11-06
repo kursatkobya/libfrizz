@@ -111,9 +111,22 @@ pub async fn execute_request(exec: ExecRequest) -> Result<FizzResult, reqwest::E
 
 fn get_ports(min_port: u16, max_port: u16) -> (Box<dyn Iterator<Item = u16>>, u16) {
     if min_port == 0 && max_port == 0 {
+        //tcp
         (
-            Box::new(port_details::MOST_COMMON_PORTS.to_owned().into_iter()),
-            port_details::MOST_COMMON_PORTS.len() as u16,
+            Box::new(port_details::MOST_COMMON_TCP_PORTS.to_owned().into_iter()),
+            port_details::MOST_COMMON_TCP_PORTS.len() as u16,
+        )
+    } else if min_port == 0 && max_port == 1 {
+        //udp
+        (
+            Box::new(port_details::MOST_COMMON_UDP_PORTS.to_owned().into_iter()),
+            port_details::MOST_COMMON_UDP_PORTS.len() as u16,
+        )
+    } else if min_port == 0 && max_port == 2 {
+        //sctp
+        (
+            Box::new(port_details::MOST_COMMON_SCTP_PORTS.to_owned().into_iter()),
+            port_details::MOST_COMMON_SCTP_PORTS.len() as u16,
         )
     } else {
         (Box::new(min_port..=max_port), max_port - min_port)
@@ -157,7 +170,7 @@ pub async fn scan(
     out_writer
         .write(
             Colour::Green
-                .paint(format!("Port\tService\t\tProtocol\n"))
+                .paint("Port\tService\t\tProtocol\n".to_string())
                 .as_bytes(),
         )
         .ok();

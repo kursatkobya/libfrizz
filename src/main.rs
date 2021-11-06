@@ -120,7 +120,15 @@ async fn main() -> Result<(), Error> {
 
         let mut port1: u16 = 0;
         let mut port2: u16 = 0;
-        if cmd_args.is_present("ports") {
+        if cmd_args.is_present("protocol") {
+            let proto_opt = cmd_args.value_of("protocol").unwrap_or("tcp");
+            port1 = match proto_opt {
+                "tcp" => 0,
+                "udp" => 1,
+                "sctp" => 2,
+                _ => 0,
+            }
+        } else if cmd_args.is_present("ports") {
             let port_range: Vec<&str> = cmd_args.values_of("ports").unwrap().collect();
             if !port_range.is_empty() {
                 port1 = port_range[0]
