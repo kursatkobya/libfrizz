@@ -232,6 +232,7 @@ mod tests {
     use ansi_term::Colour;
 
     use super::*;
+    use rstest::rstest;
 
     #[tokio::test]
     async fn test_get_header() {
@@ -270,5 +271,29 @@ mod tests {
         println!("{}", Colour::Red.paint(res.status_code));
         println!("{}", Colour::Green.paint(res.headers));
         println!("{}", Colour::Blue.paint(res.body));
+    }
+
+    #[rstest]
+    #[case(0, 0)]
+    #[case(0, 1)]
+    #[case(0, 2)]
+    #[case(0, 80)]
+    fn test_get_ports(#[case] min_p: u16, #[case] max_p: u16) {
+        let (_port_box, progress_size) = get_ports(min_p, max_p);
+        match max_p {
+            0 => assert_eq!(
+                progress_size,
+                port_details::MOST_COMMON_TCP_PORTS.len() as u16
+            ),
+            1 => assert_eq!(
+                progress_size,
+                port_details::MOST_COMMON_UDP_PORTS.len() as u16
+            ),
+            2 => assert_eq!(
+                progress_size,
+                port_details::MOST_COMMON_SCTP_PORTS.len() as u16
+            ),
+            _ => assert_eq!(progress_size, max_p - min_p),
+        }
     }
 }
