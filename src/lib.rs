@@ -150,7 +150,7 @@ pub async fn scan(
     pb.set_style(ProgressStyle::default_bar()
         .template("{msg}\n{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {pos:>}/{len}  ({percent}%, {eta})")
         .progress_chars("##-"));
-    pb.set_message(format!("Scanning ports for {}", target));
+    pb.set_message(format!("Scanning ports for {} min-max ports:{},{}", target,min_port,max_port));
 
     ports
         .for_each_concurrent(concurrency, |port| {

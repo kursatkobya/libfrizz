@@ -128,7 +128,8 @@ async fn main() -> Result<(), Error> {
                 "sctp" => 2,
                 _ => 0,
             }
-        } else if cmd_args.is_present("ports") {
+        } 
+        if cmd_args.is_present("ports") {
             let port_range: Vec<&str> = cmd_args.values_of("ports").unwrap().collect();
             if !port_range.is_empty() {
                 port1 = port_range[0]
