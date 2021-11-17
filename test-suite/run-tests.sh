@@ -42,7 +42,13 @@ $FRIZZEXEC -kv -t https://localhost/static_response -o test.txt
 $FRIZZEXEC -k -t https://localhost/static_response
 $FRIZZEXEC -k -# -t https://localhost/static_response
 $FRIZZEXEC -k --progress-bar -t https://localhost/static_response
+
+# caddy port scan
 $FRIZZEXEC -s -t localhost --ports 80 1024
+$FRIZZEXEC -s --udp -t example.org -o output
+$FRIZZEXEC -s --tcp -t example.org
+$FRIZZEXEC -s --sctp -t example.org --ports 80 1024
+
 
 # TODO after https://github.com/kursatkobya/libfrizz/issues/21 basic authentication imlpementation we can enable tests below
 #curl -uBob:hiccup -kv https://localhost/secret/test

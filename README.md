@@ -18,7 +18,8 @@
 # frizz -s -t example.net --ports 80 1024
 # frizz -s -t example.net --timeout 1 -c 1024
 # frizz -s -t example.net --timeout 1 -c 1024 -o output.txt
-# frizz -s -t example.net --timeout 1 --protocol sctp -o output
+# frizz -s -t example.net --timeout 1 --sctp -o output
+# frizz -s -t example.net --timeout 1 --tcp -o output
 ```
 
 Check [Git workflow](https://github.com/kursatkobya/libfrizz/wiki/Git-workflow) for how to contribute.

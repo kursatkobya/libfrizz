@@ -22,6 +22,14 @@ use tokio::{
     net::TcpStream,
 };
 
+#[derive(Copy, Clone, PartialEq, Eq)]
+pub enum TransportLayerProtocol {
+    Udp,
+    Tcp,
+    Sctp,
+    None,
+}
+
 pub struct FizzResult {
     pub status_code: String,
     pub headers: String,
@@ -109,21 +117,22 @@ pub async fn execute_request(exec: ExecRequest) -> Result<FizzResult, reqwest::E
     })
 }
 
-fn get_ports(min_port: u16, max_port: u16) -> (Box<dyn Iterator<Item = u16>>, u16) {
-    if min_port == 0 && max_port == 0 {
-        //tcp
+fn get_ports(
+    min_port: u16,
+    max_port: u16,
+    tl_protocol: TransportLayerProtocol,
+) -> (Box<dyn Iterator<Item = u16>>, u16) {
+    if tl_protocol == TransportLayerProtocol::Tcp {
         (
             Box::new(port_details::MOST_COMMON_TCP_PORTS.to_owned().into_iter()),
             port_details::MOST_COMMON_TCP_PORTS.len() as u16,
         )
-    } else if min_port == 0 && max_port == 1 {
-        //udp
+    } else if tl_protocol == TransportLayerProtocol::Udp {
         (
             Box::new(port_details::MOST_COMMON_UDP_PORTS.to_owned().into_iter()),
             port_details::MOST_COMMON_UDP_PORTS.len() as u16,
         )
-    } else if min_port == 0 && max_port == 2 {
-        //sctp
+    } else if tl_protocol == TransportLayerProtocol::Sctp {
         (
             Box::new(port_details::MOST_COMMON_SCTP_PORTS.to_owned().into_iter()),
             port_details::MOST_COMMON_SCTP_PORTS.len() as u16,
@@ -139,9 +148,10 @@ pub async fn scan(
     timeout: u64,
     min_port: u16,
     max_port: u16,
+    tl_protocol: TransportLayerProtocol,
     mut out_writer: Box<dyn Write>,
 ) {
-    let (port_box, progress_size) = get_ports(min_port, max_port);
+    let (port_box, progress_size) = get_ports(min_port, max_port, tl_protocol);
     let ports = stream::iter(port_box);
     let output_values = Arc::new(Mutex::new(Vec::new()));
     let before = Instant::now();
@@ -150,7 +160,11 @@ pub async fn scan(
     pb.set_style(ProgressStyle::default_bar()
         .template("{msg}\n{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {pos:>}/{len}  ({percent}%, {eta})")
         .progress_chars("##-"));
-    pb.set_message(format!("Scanning ports for {} min-max ports:{},{}", target,min_port,max_port));
+
+    pb.set_message(format!(
+        "Scanning ports for {} min-max ports:{},{}",
+        target, min_port, max_port
+    ));
 
     ports
         .for_each_concurrent(concurrency, |port| {
@@ -274,22 +288,26 @@ mod tests {
     }
 
     #[rstest]
-    #[case(0, 0)]
-    #[case(0, 1)]
-    #[case(0, 2)]
-    #[case(0, 80)]
-    fn test_get_ports(#[case] min_p: u16, #[case] max_p: u16) {
-        let (_port_box, progress_size) = get_ports(min_p, max_p);
-        match max_p {
-            0 => assert_eq!(
+    #[case(0, 0, TransportLayerProtocol::Tcp)]
+    #[case(0, 1, TransportLayerProtocol::Udp)]
+    #[case(0, 2, TransportLayerProtocol::Sctp)]
+    #[case(10, 100, TransportLayerProtocol::None)]
+    fn test_get_ports(
+        #[case] min_p: u16,
+        #[case] max_p: u16,
+        #[case] proto: TransportLayerProtocol,
+    ) {
+        let (_port_box, progress_size) = get_ports(min_p, max_p, proto);
+        match proto {
+            TransportLayerProtocol::Tcp => assert_eq!(
                 progress_size,
                 port_details::MOST_COMMON_TCP_PORTS.len() as u16
             ),
-            1 => assert_eq!(
+            TransportLayerProtocol::Udp => assert_eq!(
                 progress_size,
                 port_details::MOST_COMMON_UDP_PORTS.len() as u16
             ),
-            2 => assert_eq!(
+            TransportLayerProtocol::Sctp => assert_eq!(
                 progress_size,
                 port_details::MOST_COMMON_SCTP_PORTS.len() as u16
             ),
