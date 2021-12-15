@@ -1,8 +1,9 @@
 use ansi_term::Colour;
 use clap::{load_yaml, App};
 use dprint_core::formatting::PrintOptions;
-use libfrizz::ExecRequest;
+use libfrizz::{execute_request, ExecRequest, TransportLayerProtocol};
 use reqwest::{Method, Url};
+use std::process::exit;
 use std::{
     cmp, env,
     fs::File,
@@ -11,7 +12,8 @@ use std::{
     net::{SocketAddr, ToSocketAddrs},
     path::Path,
 };
-use std::process::exit;
+
+mod port_details;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -22,7 +24,7 @@ async fn main() -> Result<(), Error> {
     if !cmd_args.is_present("target") {
         println!("\nERROR:Please provide the parameters\n");
         App::from(yaml).print_help().ok();
-        return Ok(());
+        exit(0);
     }
     let target = cmd_args.value_of("target").unwrap();
 
@@ -33,6 +35,7 @@ async fn main() -> Result<(), Error> {
     } else {
         simple_logger::init_with_level(log::Level::Info).unwrap();
     }
+    port_details::init().await;
     let user_agent = if cmd_args.is_present("user-agent") {
         String::from(cmd_args.value_of("user-agent").unwrap())
     } else {
@@ -60,12 +63,17 @@ async fn main() -> Result<(), Error> {
     if target.starts_with("http") {
         match Url::parse(target) {
             Err(e) => {
-                println!("Exiting because wrong url({}) and the reason is \"{}\".",target, e);
+                println!(
+                    "Exiting because wrong url({}) and the reason is \"{}\".",
+                    target, e
+                );
                 exit(0);
-            },
-            _ => {log::debug!("url is okay.")}
+            }
+            _ => {
+                log::debug!("url is okay.")
+            }
         }
-        let res = libfrizz::execute_request(ExecRequest {
+        let res = execute_request(ExecRequest {
             url: target.to_string(),
             user_agent,
             verbose,
@@ -75,8 +83,8 @@ async fn main() -> Result<(), Error> {
             http_method: method,
             progress_bar: cmd_args.is_present("progress-bar"),
         })
-            .await
-            .unwrap();
+        .await
+        .unwrap();
         let body = res.body;
 
         if cmd_args.is_present("fail") && !res.status_code.contains("200") {
@@ -128,13 +136,13 @@ async fn main() -> Result<(), Error> {
 
         let mut port1: u16 = 0;
         let mut port2: u16 = 0;
-        let mut proto_opt = libfrizz::TransportLayerProtocol::None;
+        let mut proto_opt = TransportLayerProtocol::None;
         if cmd_args.is_present("udp") {
-            proto_opt = libfrizz::TransportLayerProtocol::Udp;
+            proto_opt = TransportLayerProtocol::Udp;
         } else if cmd_args.is_present("tcp") {
-            proto_opt = libfrizz::TransportLayerProtocol::Tcp;
+            proto_opt = TransportLayerProtocol::Tcp;
         } else if cmd_args.is_present("sctp") {
-            proto_opt = libfrizz::TransportLayerProtocol::Sctp;
+            proto_opt = TransportLayerProtocol::Sctp;
         }
 
         if cmd_args.is_present("ports") {
@@ -158,7 +166,7 @@ async fn main() -> Result<(), Error> {
             proto_opt,
             out_writer,
         )
-            .await;
+        .await;
         return Ok(());
     } else {
         // assume telnet or any socket protocol

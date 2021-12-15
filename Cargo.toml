@@ -23,6 +23,13 @@ lazy_static = "1.4.0"
 rstest = "0.11.0"
 async-stream = "0.3.2"
 tokio-util = "0.6.9"
+serde_json = "1.0.72"
+home = "0.5.3"
+jql = "3.0.5"
+regex = "1.5.4"
+chrono = "0.4.19"
+strum_macros = "0.23.1"
+strum = "0.23.0"
 
 [dev-dependencies]
 serial_test = "0.5.1"
